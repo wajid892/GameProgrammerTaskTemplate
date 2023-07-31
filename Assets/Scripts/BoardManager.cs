@@ -97,11 +97,18 @@ public class BoardManager : MonoBehaviour
         BoardHighlights.Instance.HighLightAllowedMoves(allowedMoves);
     }
 
+    private bool calculateVictory()
+    {
+        var rng = new System.Random();
+        return rng.Next(0, 100) < 50;
+    }
+
     private void MoveChessman(int x, int y)
     {
         if (allowedMoves[x, y])
         {
             Chessman c = Chessmans[x, y];
+            var victory = true;
 
             if (c != null && c.isWhite != isWhiteTurn)
             {
@@ -114,8 +121,17 @@ public class BoardManager : MonoBehaviour
                     return;
                 }
 
-                activeChessman.Remove(c.gameObject);
-                Destroy(c.gameObject);
+                victory = calculateVictory();
+                if (victory)
+                {
+                    activeChessman.Remove(c.gameObject);
+                    Destroy(c.gameObject);
+                }
+                else
+                {
+                    activeChessman.Remove(selectedChessman.gameObject);
+                    Destroy(selectedChessman.gameObject);
+                }
             }
             if (x == EnPassantMove[0] && y == EnPassantMove[1])
             {
@@ -131,7 +147,7 @@ public class BoardManager : MonoBehaviour
             EnPassantMove[1] = -1;
             if (selectedChessman.GetType() == typeof(Pawn))
             {
-                if(y == 7) // White Promotion
+                if (y == 7) // White Promotion
                 {
                     activeChessman.Remove(selectedChessman.gameObject);
                     Destroy(selectedChessman.gameObject);
@@ -152,10 +168,13 @@ public class BoardManager : MonoBehaviour
                     EnPassantMove[1] = y + 1;
             }
 
-            Chessmans[selectedChessman.CurrentX, selectedChessman.CurrentY] = null;
-            selectedChessman.transform.position = GetTileCenter(x, y);
-            selectedChessman.SetPosition(x, y);
-            Chessmans[x, y] = selectedChessman;
+            if (victory)
+            {
+                Chessmans[selectedChessman.CurrentX, selectedChessman.CurrentY] = null;
+                selectedChessman.transform.position = GetTileCenter(x, y);
+                selectedChessman.SetPosition(x, y);
+                Chessmans[x, y] = selectedChessman;
+            }
             isWhiteTurn = !isWhiteTurn;
         }
 
