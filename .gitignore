@@ -36,4 +36,8 @@ sysinfo.txt
 # Logs
 /Logs
 
+# Models
+/Assets/StreamingAssets/GPT4All/*.meta
+/Assets/StreamingAssets/GPT4All/*.bin
+
 .vsconfig
